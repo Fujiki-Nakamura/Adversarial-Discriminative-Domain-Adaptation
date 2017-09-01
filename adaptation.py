@@ -7,6 +7,7 @@ import logging
 import os
 
 from keras.preprocessing.image import ImageDataGenerator
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import loadmat
 import tensorflow as tf
@@ -111,6 +112,7 @@ def main(args):
     bar = tqdm(range(iterations))
     bar.set_description('(lr: {:.0e})'.format(lr))
     bar.refresh()
+    losses = []
 
     with tf.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
@@ -128,6 +130,7 @@ def main(args):
             )
             target_losses.append(target_loss_val)
             d_losses.append(d_loss_val)
+            losses.append([target_loss_val, d_loss_val])
             if i % display == 0:
                 logging.info('{:20} Target: {:5.4f} (avg: {:5.4f})'
                              '    Discriminator: {:5.4f} (avg: {:5.4f})'
@@ -143,6 +146,14 @@ def main(args):
             if (i + 1) % snapshot == 0:
                 snapshot_path = target_saver.save(sess, save_path)
                 logging.info('Saved snapshot to {}'.format(snapshot_path))
+
+    # Save visualization of training losses
+    losses = np.array(losses)
+    plt.plot(losses.T[0], label='Target CNN Loss', alpha=0.5)
+    plt.plot(losses.T[1], label='Discriminator Loss', alpha=0.5)
+    plt.title('Training Losses')
+    plt.legend()
+    plt.savefig('./output/losses.png')
 
 
 if __name__ == '__main__':
