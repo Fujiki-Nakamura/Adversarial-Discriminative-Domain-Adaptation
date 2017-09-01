@@ -90,8 +90,6 @@ def main(args):
     src_vars = [
         var for var in tf.get_collection(
             tf.GraphKeys.GLOBAL_VARIABLES, scope='source_cnn')]
-    source_saver = tf.train.Saver(var_list=src_vars)
-    target_saver = tf.train.Saver(var_list=target_vars)
 
     lr_var = tf.Variable(lr, name='learning_rate', trainable=False)
     with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
@@ -103,6 +101,9 @@ def main(args):
         ).minimize(d_loss, var_list=d_vars)
 
     # Train
+    source_saver = tf.train.Saver(var_list=src_vars)
+    target_saver = tf.train.Saver(var_list=target_vars)
+
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     target_losses = deque(maxlen=10)
@@ -128,8 +129,8 @@ def main(args):
             target_losses.append(target_loss_val)
             d_losses.append(d_loss_val)
             if i % display == 0:
-                logging.info('{:20} Target: {:6.4f}     (avg: {:6.4f})'
-                             '    Discriminator: {:6.4f}     (avg: {:6.4f})'
+                logging.info('{:20} Target: {:5.4f} (avg: {:5.4f})'
+                             '    Discriminator: {:5.4f} (avg: {:5.4f})'
                              .format('Iteration {}:'.format(i),
                                      target_loss_val,
                                      np.mean(target_losses),
