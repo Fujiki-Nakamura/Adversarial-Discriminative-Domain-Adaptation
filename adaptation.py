@@ -93,13 +93,9 @@ def main(args):
             tf.GraphKeys.GLOBAL_VARIABLES, scope='source_cnn')]
 
     lr_var = tf.Variable(lr, name='learning_rate', trainable=False)
-    with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-        target_train_op = tf.train.AdamOptimizer(
-            lr_var, beta1=beta1
-        ).minimize(target_loss, var_list=target_vars)
-        d_train_op = tf.train.AdamOptimizer(
-            lr_var, beta1
-        ).minimize(d_loss, var_list=d_vars)
+    optimizer = tf.train.AdamOptimizer(lr_var, beta1)
+    target_train_op = optimizer.minimize(target_loss, var_list=target_vars)
+    d_train_op = optimizer.minimize(d_loss, var_list=d_vars)
 
     # Train
     source_saver = tf.train.Saver(var_list=src_vars)
