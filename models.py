@@ -50,7 +50,6 @@ def source_cnn(x, nb_classes, trainable=False, adapt=False):
 
 
 def target_cnn(x, nb_classes, trainable=True, training=True, testing=False):
-    x = tf.image.resize_images(x, [28, 28])
     with tf.variable_scope('target_cnn'):
         padding = 'valid'
         # conv1
