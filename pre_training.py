@@ -47,13 +47,6 @@ def main(args):
         np.multiply(train_images, RGB2GRAY),
         3, keepdims=True
     )
-    train_labels = keras.utils.to_categorical(train_labels, num_classes=10)
-    # Load test data
-    test_mat = loadmat('./data/svhn/test_32x32.mat')
-    test_images = test_mat['X'].transpose((3, 0, 1, 2))
-    test_images = test_images.astype(np.float32) / 255.
-    test_labels = test_mat['y'].squeeze()
-    test_labels[test_labels == 10] = 0
     # Data generator
     idg = ImageDataGenerator()
     train_data_gen = idg.flow(
@@ -65,11 +58,9 @@ def main(args):
     tf.reset_default_graph()
     x = tf.placeholder(tf.float32, (None, 32, 32, 1))
     x_resized = tf.image.resize_images(x, [28, 28])
-    t = tf.placeholder(tf.float32, (None, nb_classes))
+    t = tf.placeholder(tf.int32, (None,))
     logits = source_cnn(x_resized, nb_classes=nb_classes, trainable=True)
-    loss = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits(
-            logits=logits, labels=t))
+    loss = tf.losses.sparse_softmax_cross_entropy(t, logits)
     lr_var = tf.Variable(lr, name='learning_rate', trainable=False)
     optimizer = tf.train.AdamOptimizer(learning_rate=lr)
     train_op = optimizer.minimize(loss)
