@@ -8,6 +8,7 @@ import os
 
 import keras
 from keras.preprocessing.image import ImageDataGenerator
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import loadmat
 import tensorflow as tf
@@ -91,6 +92,7 @@ def main(args):
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     losses = deque(maxlen=10)
+    training_losses = []
     bar = tqdm(range(iterations))
     bar.set_description('(lr: {:.0e})'.format(lr))
     bar.refresh()
@@ -103,6 +105,7 @@ def main(args):
                 [loss, train_op], feed_dict={x: batch_images, t: batch_labels}
             )
             losses.append(loss_val)
+            training_losses.append(loss_val)
             if i % display == 0:
                 logging.info('{:20} {:10.4f}     (avg: {:10.4f})'.format(
                     'Iteration {}:'.format(i), loss_val, np.mean(losses)))
@@ -115,6 +118,11 @@ def main(args):
                 if len(classifier_vars) > 0:
                     clf_saver.save(sess, save_path_clf)
                 logging.info('Saved snapshot to {}'.format(snapshot_path))
+
+    plt.plot(training_losses, label='Source CNN Loss')
+    plt.title('Pre-Training Loss')
+    plt.legend()
+    plt.savefig('./pre_training_losses.png')
 
 
 if __name__ == '__main__':
