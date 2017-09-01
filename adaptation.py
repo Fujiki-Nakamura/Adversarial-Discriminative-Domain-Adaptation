@@ -149,7 +149,7 @@ def main(args):
     plt.plot(losses.T[1], label='Discriminator Loss', alpha=0.5)
     plt.title('Training Losses')
     plt.legend()
-    plt.savefig('./output/losses.png')
+    plt.savefig('./losses.png')
 
 
 if __name__ == '__main__':
