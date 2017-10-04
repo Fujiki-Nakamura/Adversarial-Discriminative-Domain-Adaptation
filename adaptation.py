@@ -45,9 +45,11 @@ def main(args):
         np.multiply(train_images, RGB2GRAY),
         3, keepdims=True
     )
+    assert 0.0 <= np.min(train_images) and np.max(train_images) <= 1.0
     # Load target data
     target_images = util._read_images(
         './data/mnist/train-images-idx3-ubyte.gz')
+    assert 0.0 <= np.min(target_images) and np.max(target_images) <= 1.0
     # Data generator
     idg = ImageDataGenerator()
     source_data_gen = idg.flow(
@@ -149,6 +151,7 @@ def main(args):
     plt.plot(losses.T[1], label='Discriminator Loss', alpha=0.5)
     plt.title('Training Losses')
     plt.legend()
+    os.remove('./losses.png')
     plt.savefig('./losses.png')
 
 
